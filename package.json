@@ -1,0 +1,42 @@
+{
+  "author": {
+    "name": "Nasa8x",
+    "email": "nasa8x@gmail.com"
+  },
+  "dependencies": {
+    "redis": "^2.6.2"
+  },
+  "description": "Integrated Redis caching for Mongoose queries.",
+  "keywords": [
+    "mongoose redis",
+    "mongoose",
+    "mongoose cache",
+    "redis mongoose",
+    "redis mongodb",
+    "redis mongo",
+    "redis",
+    "cache",
+    "cached",
+    "caching",
+    "performance",
+    "mongodb cache",
+    "mongodb",
+    "redis cache",
+    "mongo cache",
+    "node cache",
+    "nosql"
+  ],
+  "license": "MIT",
+  "main": "./index.js",
+  "maintainers": [
+    {
+      "name": "nasa8x",
+      "email": "nasa8x@gmail.com"
+    }
+  ],
+  "name": "mongoose-redis",
+  "optionalDependencies": {},
+  "readme": "ERROR: No README data found!",
+  "scripts": {},
+  "version": "1.1.0"
+}
