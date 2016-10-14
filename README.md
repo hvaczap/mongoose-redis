@@ -1,4 +1,7 @@
 
+
+[![NPM](https://nodei.co/npm/mongoose-redis.png?downloads=true&downloadRank=true&stars=true)](https://www.npmjs.com/package/mongoose-redis)
+
 #About
 Best Performance Mongoose caching module that works exactly how you would expect it to, with the latest version of Mongoose.
 

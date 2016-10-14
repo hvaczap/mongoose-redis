@@ -34,6 +34,7 @@ module.exports = function (mongoose, options) {
 
     // add cache
     Query.prototype.cache = function(ttl, customKey) {
+      ttl = ttl || 60;
       if (typeof ttl === 'string') {
         customKey = ttl;
         ttl = 60;
@@ -49,7 +50,7 @@ module.exports = function (mongoose, options) {
         return _exec.call(this, op, cb);
       }
       if (isFunction(op)) {
-        cb = op
+        cb = op;
         op = null
       }
       else {
@@ -81,7 +82,7 @@ module.exports = function (mongoose, options) {
       return createMongoosePromise(function (resolve, reject) {
         client.get(_key, function(err, result){
           if(!result){
-            return _exec.call(_self, function(err, docs) {
+            return _exec.call(_self, op, function(err, docs) {
               if (err) {
                 return reject(err), cb(err);
               }
@@ -94,6 +95,9 @@ module.exports = function (mongoose, options) {
                   client.set(_key, _val);
                   client.expire(_key, _expires);
                 });
+              } else {
+                client.set(_key, _val);
+                client.expire(_key, _expires);
               }
               cb(null, docs);
               return resolve(docs);
