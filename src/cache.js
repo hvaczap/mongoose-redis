@@ -45,6 +45,20 @@ module.exports = function (mongoose, options) {
       return this;
     };
 
+    // cache again the request
+    Query.prototype.reCache = function(ttl, customKey) {
+      ttl = ttl || 60;
+      if (typeof ttl === 'string') {
+        customKey = ttl;
+        ttl = 60;
+      }
+
+      this._ttl = ttl;
+      this._reCache = true;
+      this._key = customKey;
+      return this;
+    };
+
     Query.prototype.exec = function(op, cb) {
       if (!(this._ttl)) {
         return _exec.call(this, op, cb);
@@ -58,6 +72,7 @@ module.exports = function (mongoose, options) {
       }
       var _self = this;
       var _expires = this._ttl;
+      var _reCache = this._reCache;
       var _collectionName = this.model.collection.name;
 
       var  model = this.model;
@@ -79,51 +94,61 @@ module.exports = function (mongoose, options) {
 
       var _key = this._key || crypto.createHash('md5').update(JSON.stringify(_meta)).digest('hex');
 
-      return createMongoosePromise(function (resolve, reject) {
-        client.get(_key, function(err, result){
-          if(!result){
-            return _exec.call(_self, op, function(err, docs) {
-              if (err) {
-                return reject(err), cb(err);
-              }
-              var _val = JSON.stringify(docs);
-              if(zip){
-                _val = zlib.deflate(_val, function(err, buffer){
-                  if(err)
-                    console.log(err);
-                  _val = buffer.toString('base64');
-                  client.set(_key, _val);
-                  client.expire(_key, _expires);
-                });
-              } else {
-                client.set(_key, _val);
-                client.expire(_key, _expires);
-              }
-              cb(null, docs);
-              return resolve(docs);
-
-
-            });
-          }
-          else {
-            //var _val = JSON.parse(result);
+      function saveFind(callback) {
+          return _exec.call(_self, op, function(err, docs) {
+            if (err) {
+              return callback(err);
+            }
+            var _val = JSON.stringify(docs);
             if(zip){
-              var _input = new Buffer(result, 'base64');
-              zlib.inflate(_input, function(err, buffer){
+              _val = zlib.deflate(_val, function(err, buffer){
                 if(err)
                   console.log(err);
-                _val = JSON.parse(buffer.toString());
-                cb(null, _val);
-                return resolve(_val);
+                _val = buffer.toString('base64');
+                client.set(_key, _val);
+                client.expire(_key, _expires);
               });
+            } else {
+              client.set(_key, _val);
+              client.expire(_key, _expires);
             }
-            else {
-              var _val = JSON.parse(result);
-              cb(null, _val);
-              return resolve(_val);
-            }
+            return callback(null, docs);
+          });
+      }
+      function parseResult(result, callback) {
+        if(zip){
+          var _input = new Buffer(result, 'base64');
+          zlib.inflate(_input, function(err, buffer){
+            if(err)
+              console.log(err);
+            var _val = JSON.parse(buffer.toString());
+            return callback(null, _val);
+          });
+        }
+        else {
+          var _val = JSON.parse(result);
+          return callback(null, _val);
+        }
+      }
 
+      function clientWillGet(callback) {
+        client.get(_key, function(err, result){
+          if(!result){ saveFind(callback) }
+          else { parseResult(result, callback) }
+          })
+      }
+      function findDocs(callback) {
+        if(_reCache) {
+          return saveFind(callback)
+        }
+        return clientWillGet(callback)
+      }
+      return createMongoosePromise(function (resolve, reject) {
+        return findDocs(function (err, docs) {
+          if (err) {
+            return reject(err);
           }
+          return resolve(docs);
         })
       }.bind(this));
     };

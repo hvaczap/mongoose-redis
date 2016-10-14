@@ -22,7 +22,7 @@ mongoose.connect('mongodb://localhost/FooExample');
 connection.on('open', function () {
   Foo.create({});
   Foo.find({})
-    .cache(20000)
+    .reCache(50)
     .then(function (data) {
       console.log('Data Promise',data);
     })

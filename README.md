@@ -47,6 +47,14 @@ Post.find({ stt: 1 }).sort({ crt: -1 })
   // do something
 });
 
+Post.find({ stt: 1 }).sort({ crt: -1 })
+.limit(30)
+.reCache(120) // cache 120 seconds and save again on redis
+.select({ tl: 1, lth:1, views:1, img: 1, slug: 1})
+.exec(function(err, docs) {
+  // do something
+});
+
 ```
 You can also pass a custom key into the .cache() method, which you can then use later to clear the cached content.
 
