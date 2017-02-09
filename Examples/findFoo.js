@@ -4,7 +4,9 @@
 var mongoose = require('mongoose');
 var MongooseCache = require('../index');
 
-var cache = MongooseCache(mongoose, {port: 6379, host: 'localhost', compress: true });
+var cache = MongooseCache(mongoose, {port: 6379, host: 'localhost', compress: false, options: {
+  db: 4,
+} });
 
 
 var rand = function() { return Math.floor(Math.random() * 500)};
@@ -20,9 +22,9 @@ var connection = mongoose.connection;
 mongoose.connect('mongodb://localhost/FooExample');
 
 connection.on('open', function () {
-  Foo.create({});
-  Foo.find({})
-    .reCache(50)
+  // Foo.create({});
+  Foo.findOne({},'count')
+    .cache(50)
     .then(function (data) {
       console.log('Data Promise',data);
     })

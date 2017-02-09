@@ -2,7 +2,8 @@
 'use strict';
  var redis = require('redis'),
      zlib = require('zlib'),
-     crypto = require('crypto');
+     crypto = require('crypto'),
+      _ = require('lodash');
 module.exports = function (mongoose, options) {
   if (mongoose == null) {
     throw new Error('An instance of mongoose needs passing in')
@@ -89,7 +90,8 @@ module.exports = function (mongoose, options) {
         query: _self._conditions,
         fields: _self._fields || {},
         path: _self._path,
-        distinct: _self._distinct
+        distinct: _self._distinct,
+        op: _self.op,
       };
 
       var _key = this._key || crypto.createHash('md5').update(JSON.stringify(_meta)).digest('hex');
@@ -99,7 +101,17 @@ module.exports = function (mongoose, options) {
             if (err) {
               return callback(err);
             }
-            var _val = JSON.stringify(docs);
+            var docsMapped = docs;
+            if (!docs) {
+              return callback(null, docs);
+            } else if (_.isArray(docs)) {
+              docsMapped = _.map(docs, function (d) {
+                return d.toJSON();
+              })
+            } else {
+              docsMapped = docsMapped.toJSON();
+            }
+            var _val = JSON.stringify(docsMapped);
             if(zip){
               _val = zlib.deflate(_val, function(err, buffer){
                 if(err)
