@@ -103,7 +103,7 @@ module.exports = function (mongoose, options) {
             }
             var docsMapped = docs;
             if (!docs) {
-              return callback(null, docs);
+              docsMapped = undefined;
             } else if (_.isArray(docs)) {
               docsMapped = _.map(docs, function (d) {
                 return d.toJSON();
