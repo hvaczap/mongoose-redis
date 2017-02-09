@@ -4,7 +4,7 @@
 var mongoose = require('mongoose');
 var MongooseCache = require('../index');
 
-var cache = MongooseCache(mongoose, {port: 6379, host: 'localhost', compress: false, options: {
+var cache = MongooseCache(mongoose, {port: 6379, host: 'localhost', compress: true, options: {
   db: 4,
 } });
 
@@ -23,7 +23,7 @@ mongoose.connect('mongodb://localhost/FooExample');
 
 connection.on('open', function () {
   // Foo.create({});
-  Foo.findOne({},'count')
+  Foo.findOne({count : 9},'count')
     .cache(50)
     .then(function (data) {
       console.log('Data Promise',data);
