@@ -138,10 +138,10 @@ module.exports = function (mongoose, options) {
             }
             try {
               var _val = JSON.parse(buffer.toString());
-              return callback(null, null);
+              return callback(null, _val);
             } catch(err) {
               console.log(err);
-              return callback(err);
+              return callback(null, null);
             }
           });
         } else {
