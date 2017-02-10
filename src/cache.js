@@ -138,8 +138,9 @@ module.exports = function (mongoose, options) {
             }
             try {
               var _val = JSON.parse(buffer.toString());
-              return callback(null, _val);
+              return callback(null, null);
             } catch(err) {
+              console.log(err);
               return callback(err);
             }
           });
@@ -148,7 +149,8 @@ module.exports = function (mongoose, options) {
             var _val = JSON.parse(result);
             return callback(null, _val);
           } catch (err) {
-            return callback(err);
+            console.log(err);
+            return callback(null, null);
           }
         }
       }
