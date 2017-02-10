@@ -133,13 +133,23 @@ module.exports = function (mongoose, options) {
           zlib.inflate(_input, function(err, buffer){
             if(err)
               console.log(err);
-            var _val = JSON.parse(buffer.toString());
-            return callback(null, _val);
+            if (!buffer) {
+              return callback(null, null);
+            }
+            try {
+              var _val = JSON.parse(buffer.toString());
+              return callback(null, _val);
+            } catch(err) {
+              return callback(err);
+            }
           });
-        }
-        else {
-          var _val = JSON.parse(result);
-          return callback(null, _val);
+        } else {
+          try {
+            var _val = JSON.parse(result);
+            return callback(null, _val);
+          } catch (err) {
+            return callback(err);
+          }
         }
       }
 
