@@ -183,14 +183,12 @@ module.exports = function (mongoose, options) {
   function createMongoosePromise(resolver) {
     var promise;
 
-    // mongoose 4.1.x and up
     if (mongoose.Promise.ES6) {
-      promise = new mongoose.Promise.ES6(resolver)
-    }
-    // backward compatibility
-    else {
-      promise = new mongoose.Promise;
-      resolver(promise.resolve.bind(promise, null), promise.reject.bind(promise))
+      // mongoose 4.1.x => 5.0.0
+      promise = new mongoose.Promise.ES6(resolver);
+    } else if (mongoose.Promise) {
+      // mongoose > 5.0.0
+      promise = new mongoose.Promise(resolver);
     }
 
     return promise
