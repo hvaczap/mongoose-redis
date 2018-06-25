@@ -9,7 +9,6 @@ module.exports = function (mongoose, options) {
     throw new Error('An instance of mongoose needs passing in')
   }
 
-  console.log('mongoose-redis init create cache prototype.');
   var  host = options.host || "localhost";
   var  port = options.port || 6379;
   var  pwd = options.pass || options.password || options.pwd || "";
